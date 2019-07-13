@@ -24,47 +24,97 @@
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">用户名称：</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control" id="inputEmail3" value="李思思">
+                        <input type="text" name="username" class="form-control username" id="inputEmail3" value="李思思">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">昵称：</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control" id="inputEmail3" value="思思">
+                        <input type="text" name="nickname" class="form-control nickname" id="inputEmail3" value="思思">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">邮箱：</label>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control" id="inputEmail3" value="lisisi@126.com">
+                        <input type="text" name="email" class="form-control email" id="inputEmail3" value="lisisi@126.com">
                     </div>
                 </div>
                 
                 <div class="form-group">
                     <label for="inputPassword3" class="col-sm-2 control-label">用户图标：</label>
-                    <div class="col-sm-10">
+                    <div class="col-sm-10 ">
                         <img src="images/2.jpg" alt="" class="user_pic">
-                        <input type="file" id="exampleInputFile">
+                        <input type="file" name="user_pic" id="exampleInputFile">
                     </div>
                 </div>
 
                 <div class="form-group">
                         <label for="inputEmail3" class="col-sm-2 control-label">密码：</label>
                         <div class="col-sm-4">
-                            <input type="password" class="form-control" id="inputEmail3" value="12345678">
+                            <input type="password" name="password" class="form-control password" id="inputEmail3" value="12345678">
                         </div>
                     </div>
                
     
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button type="submit" class="btn btn-success">修改</button>
+                        <button type="submit" class="btn btn-success revamp">修改</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
+    <script>
+        $.get({
+            url:'http://localhost:8000/admin/userinfo_get',
+            success:function(backData){
+                // $(".username").val(backData.data.username);
+                // $(".nickname").val(backData.data.nickname);
+                // $(".email").val(backData.data.email);
+                // $(".password").val(backData.data.password);
+                for(var key in backData.data){
+                  if (backData.code == 200) {
+                    $("."+[key]).val(backData.data[key])
+                    if (key == "user_pic") {
+                        $("."+[key]).attr("src",backData.data[key]);
+                        
+                    }
+                  }
+                }
 
+                // $(".user_pic").attr("src",backData.data.user_pic);
+            }
+        })
+
+        $("#exampleInputFile").on("change",function(){
+            var res = URL.createObjectURL(this.files[0])
+            // console.log(res);
+            $(".user_pic").attr("src",res)
+            
+        })
+
+        $(".revamp").on("click",function(e){
+            e.preventDefault();
+            var fm = new FormData($(".article_form")[0]);
+            // console.log(fm.get('username'));
+            // console.log(fm.get('nickname'));
+            // console.log(fm.get('email'));
+            // console.log(fm.get('password'));
+            // console.log(fm.get('user_pic'));
+            
+            $.post({
+                url:"http://localhost:8000/admin/userinfo_edit",
+                data:fm,
+                contentType:false,
+                processData:false,
+                success:function(backData){
+                    console.log(backData);
+                    parent.location.reload = "./index.html"
+                    
+                }
+            })
+        })
+    </script>
 </body>
 
 </html>
