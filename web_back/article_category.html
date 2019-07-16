@@ -89,6 +89,9 @@
                 </div>
                 <div class="modal-body">
                     <form>
+                        
+                            <input type="hidden" class="id">
+                        
                         <div class="form-group">
                             <label for="recipient-name" class="control-label">分类名称:</label>
                             <input type="text" class="form-control" id="recipient-name1">
@@ -114,8 +117,13 @@
         });
 
         $('#model_shutoff').click(function () {
-            alert('shutoff');
+            // alert('shutoff');
             $('#addModal').modal('hide');
+            $('#addModal #model_add').html('新增').removeClass("btn-success");
+            $('#addModal .modal-title').html('新增分类');
+            $("#recipient-name1").val("");
+            $("#recipient-name2").val("");
+            $(".id").val("");
         });
 
         //   $('#model_add').click(function(){
@@ -123,12 +131,30 @@
         //     $('#addModal').modal('hide');
         //   });
 
-        $('.category_table').delegate('a', 'click', function () {
-            if ($(this).hasClass('btn-info')) {
-                $('#addModal .modal-title').html('修改分类名称');
-                $('#addModal').modal('show');
-            }
-        })      
+        $(".category_table").on("click", ".btn-info", function () {
+            var id = $(this).next().attr("data-Id");
+            var name2 = $(this).parent().prev().text();
+            var name1 = $(this).parent().prev().prev().text();
+
+            $('#addModal .modal-title').html('修改分类名称');
+            $('#addModal #model_add').html('修改').addClass("btn-success");
+            $("#recipient-name1").val(name1);
+            $("#recipient-name2").val(name2);
+            $(".id").val(id)
+            $('#addModal').modal('show');
+
+        })
+        // $('.category_table').delegate('a', 'click', function () {
+        //     if ($(this).hasClass('btn-info')) {
+
+        //     }
+        // })
+        // function deleteTr(res) {
+
+        //     //   console.log(res);
+
+        // }
+        // javascript:editTr({&quot;id&quot;:&quot;4&quot;,&quot;slug&quot;:&quot;travel&quot;,&quot;name&quot;:&quot;爱旅行&quot;})
     </script>
 
     <script src="./js/template-web.js"></script>
@@ -137,50 +163,130 @@
             <tr>
                     <td>{{v.name}}</td>
                     <td>{{v.slug}}</td>
-                    <td class="text-center" data-Id="{{v.id}}">
-                        <a href="javascript:editTr({&quot;id&quot;:&quot;4&quot;,&quot;slug&quot;:&quot;travel&quot;,&quot;name&quot;:&quot;爱旅行&quot;});"
-                            class="btn btn-info btn-xs">编辑</a>
-                        <a href="javascript:deleteTr( 4 );" class="btn btn-danger btn-xs">删除</a>
+                    <td class="text-center" >
+                        <a href="javascript:;" class="btn btn-info btn-xs">编辑</a>
+                           
+                        <a href="#" class="btn btn-danger btn-xs del" data-Id="{{v.id}}">删除</a>
                     </td>
                 </tr>
             {{/each}}
         </script>
-    <script>
-        $.get({
-            url: "http://localhost:8000/admin/category_search",
-            success: function (res) {
-                console.log(res);
-                var resHtml = template("tpl", res);
-                $("tbody").html(resHtml);
-            }
-        })
-        $(".btn-primary").on("click", function () {
-            var name = $("#recipient-name1").val();
-            var slug = $("#recipient-name2").val();
-            $.post({
-                url: "http://localhost:8000/admin/category_add",
-                data: {
-                    name: name,
-                    slug: slug,
-                },
-                success: function (res) {
-                    //   console.log(res);
-                    // location.reload = "./article_category.html";
-                    $.get({
-                        url: "http://localhost:8000/admin/category_search",
-                        success: function (res) {
-                            console.log(res);
-                            var resHtml = template("tpl", res);
-                            $("tbody").html(resHtml);
-                        }
-                    })
 
+    <script type="text/html" id="tpl2">
+
+            <tr>
+                <td>{{name}}</td>
+                <td>{{slug}}</td>
+                <td class="text-center" >
+                    <a href="javascript:;" class="btn btn-info btn-xs">编辑</a>
+                        
+                    <a href="javascript:;" class="btn btn-danger btn-xs del" data-Id="{{id}}">删除</a>
+                </td>
+            </tr>
+        </script>
+    <script>
+
+        //获取文章类别内容
+        function getContent() {
+            $.get({
+                url: "http://localhost:8000/admin/category_search",
+                success: function (res) {
+                    console.log(res);
+                    var resHtml = template("tpl", res);
+                    $("tbody").html(resHtml);
                 }
 
-
             })
+        }
+        getContent();
+        // 给删除按钮加事件委托
+        $("tbody").on("click", ".del", function (e) {
+            if (confirm("确实删除数据?")) {
+
+                e.preventDefault();
+                var id = $(this).attr("data-Id");
+                var that = this;
+                $.post({
+                    url: "http://localhost:8000/admin/category_delete",
+                    data: { "id": id },
+                    success: function (resData) {
+                        console.log(resData);
+
+                        console.log(that);
+                        $(that).parents("tr").remove();
+
+
+                    }
+                })
+            }
+        });
+
+        // 添加 或 编辑 文章类别
+        $("#model_add").on("click", function (e) {
+            //判断是添加文章类别还是编辑文章类别,turn 是编辑,false,是添加
+            if ($(this).hasClass("btn-success")) {
+                var name = $("#recipient-name1").val().trim();
+                var slug = $("#recipient-name2").val().trim();
+                var id = $(".id").val();
+                $.ajax({
+                    type: "post",
+                    url: "http://localhost:8000/admin/category_edit",
+                    data: {
+                        id: id,
+                        name: name,
+                        slug: slug
+                    },
+                    success: function (backData) {
+                        if (backData.code == 200) {
+                            alert("修改成功");
+                            getContent();
+                        }
+                    }
+                })
+            } else {
+                e.preventDefault();
+                var name = $("#recipient-name1").val().trim();
+                var slug = $("#recipient-name2").val().trim();
+                $.post({
+                    url: "http://localhost:8000/admin/category_add",
+                    data: {
+                        name: name,
+                        slug: slug,
+                    },
+                    success: function (res) {
+                        console.log(res);
+                        if (res.code == 200) {
+                            var idNum = $(".del").last().attr("data-Id") + 1;
+                            var str = template("tpl2", { "name": name, "slug": slug, "id": idNum });
+                            console.log(str);
+
+                            $("tbody").append($(str));
+                            $("#recipient-name1").val("");
+                            $("#recipient-name2").val("");
+                        }
+                        // location.reload = "./article_category.html";
+                        // $.get({
+                        //     url: "http://localhost:8000/admin/category_search",
+                        //     success: function (res) {
+                        //         console.log(res);
+                        //         var resHtml = template("tpl", res);
+                        //         $("tbody").html(resHtml);
+                        //     }
+                        // })
+
+
+                    }
+
+
+                })
+            }
+
             $('#addModal').modal('hide');
         })
+
+
+
+
 
     </script>
 

@@ -111,6 +111,16 @@
 
     </script>
     <script>
+        // document.domain = "company.com"
+        window.addEventListener("message", function (backData) {
+            // console.log(e.data);
+            console.log(backData);
+            
+            $(".user_info").children("span").html("欢迎&nbsp;&nbsp;" + backData.data.data.nickname);
+            $(".user_info").children("img").attr("src", backData.data.data.user_pic);
+            $(".user_center_link").children("img").attr("src", backData.data.data.user_pic)
+
+        }, false);
         (function () {
             $.get({
 
@@ -134,7 +144,7 @@
                 console.log("122");
 
                 e.preventDefault();
-                
+
                 if (confirm("确定退出登录吗?")) {
                     $.ajax({
                         type: "post",
