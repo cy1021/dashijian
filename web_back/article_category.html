@@ -90,15 +90,15 @@
                 <div class="modal-body">
                     <form>
                         
-                            <input type="hidden" class="id">
+                            <input type="hidden" class="id" name="id">
                         
                         <div class="form-group">
                             <label for="recipient-name" class="control-label">分类名称:</label>
-                            <input type="text" class="form-control" id="recipient-name1">
+                            <input type="text" class="form-control" id="recipient-name1" name="name">
                         </div>
                         <div class="form-group">
                             <label for="message-text" class="control-label">分类别名:</label>
-                            <input type="text" class="form-control" id="recipient-name2">
+                            <input type="text" class="form-control" id="recipient-name2" name="slug">
                         </div>
                     </form>
                 </div>
@@ -225,17 +225,20 @@
         $("#model_add").on("click", function (e) {
             //判断是添加文章类别还是编辑文章类别,turn 是编辑,false,是添加
             if ($(this).hasClass("btn-success")) {
-                var name = $("#recipient-name1").val().trim();
-                var slug = $("#recipient-name2").val().trim();
-                var id = $(".id").val();
+                // var name = $("#recipient-name1").val().trim();
+                // var slug = $("#recipient-name2").val().trim();
+                // var id = $(".id").val();
+
+                var data = $(".modal-body form").serialize();
                 $.ajax({
                     type: "post",
                     url: "http://localhost:8000/admin/category_edit",
-                    data: {
-                        id: id,
-                        name: name,
-                        slug: slug
-                    },
+                    // data: {
+                    //     id: id,
+                    //     name: name,
+                    //     slug: slug
+                    // },
+                    data:data,
                     success: function (backData) {
                         if (backData.code == 200) {
                             alert("修改成功");

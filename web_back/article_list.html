@@ -253,17 +253,17 @@
 
             <div class="row text-center">
                 <ul class="pagination pagination-sm">
-                        <li class="page-item first disabled"><a href="#" class="page-link">首页</a></li>
-                        <li class="page-item prev disabled"><a href="#" class="page-link">上一页</a></li>
-                        <li class="page-item active"><a href="#" class="page-link">1</a></li>
-                        <li class="page-item"><a href="#" class="page-link">2</a></li>
-                        <li class="page-item"><a href="#" class="page-link">3</a></li>
-                        <li class="page-item"><a href="#" class="page-link">4</a></li>
-                        <li class="page-item"><a href="#" class="page-link">5</a></li>
-                        <li class="page-item"><a href="#" class="page-link">6</a></li>
-                        <li class="page-item"><a href="#" class="page-link">7</a></li>
-                        <li class="page-item next"><a href="#" class="page-link">下一页</a></li>
-                        <li class="page-item last"><a href="#" class="page-link">尾页</a></li>
+                    <li class="page-item first disabled"><a href="#" class="page-link">首页</a></li>
+                    <li class="page-item prev disabled"><a href="#" class="page-link">上一页</a></li>
+                    <li class="page-item active"><a href="#" class="page-link">1</a></li>
+                    <li class="page-item"><a href="#" class="page-link">2</a></li>
+                    <li class="page-item"><a href="#" class="page-link">3</a></li>
+                    <li class="page-item"><a href="#" class="page-link">4</a></li>
+                    <li class="page-item"><a href="#" class="page-link">5</a></li>
+                    <li class="page-item"><a href="#" class="page-link">6</a></li>
+                    <li class="page-item"><a href="#" class="page-link">7</a></li>
+                    <li class="page-item next"><a href="#" class="page-link">下一页</a></li>
+                    <li class="page-item last"><a href="#" class="page-link">尾页</a></li>
                 </ul>
             </div>
 
@@ -309,6 +309,8 @@
 
     </script>
     <script>
+
+        var mypage = 35;
         $(function () {
             $.get({
                 url: "http://localhost:8000/admin/category_search",
@@ -320,12 +322,12 @@
 
             });
 
-            $("#btnSearch").on("click", function (e,page) {
+            $("#btnSearch").on("click", function (e, page) {
                 e.preventDefault();
                 var id = $("#selCategory").val();
                 var state = $("#selStatus").val();
-                
-               
+
+
                 $.get({
                     url: "http://localhost:8000/admin/search",
                     data: {
@@ -333,15 +335,25 @@
                         'state': state,
                         "page": page,
                         "perpage": 8
-
                     },
                     success: function (backData) {
                         // console.log(backData);
-
                         if (backData.code == 200) {
                             var resHtml = template("content", backData);
                             $("tbody").html(resHtml);
-                            // $(".page-item").eq(2).addClass("active").siblings().remove("active");
+                            // console.log(backData);
+                            if (backData.totalPage != mypage) {
+                                mypage = backData.totalPage;
+                                var totalPages = backData.totalPage;
+                                var currentPage = $pagination.twbsPagination('getCurrentPage');
+                                $pagination.twbsPagination('destroy');
+                                $pagination.twbsPagination($.extend({}, defaultOpts, {
+                                    startPage: 1,
+                                    totalPages: totalPages
+                                }));
+                            }
+
+
                         }
 
                     }
@@ -354,23 +366,44 @@
 
 
 
-            $('.pagination').twbsPagination({
+            var $pagination = $('.pagination');
+            var defaultOpts = {
                 totalPages: 35,
                 visiblePages: 7,
-                first:"首页",
-                last:"尾页",
-                prev:"上一页",
-                next:"下一页",
-                // startPage:1,
-                
-                // loop:true,
+                first: "首页",
+                last: "尾页",
+                prev: "上一页",
+                next: "下一页",
+
                 onPageClick: function (event, page) {
-                //  console.log(event,page);
-                $("#btnSearch").trigger("click",page);
-                    
+                    //  console.log(event,page);
+                    $("#btnSearch").trigger("click", page);
+
+
                     // $('#page-content').text('Page ' + page);
                 }
-            });
+            };
+            $pagination.twbsPagination(defaultOpts);
+
+
+
+            // $('.pagination').twbsPagination({
+            //     totalPages: 35,
+            //     visiblePages: 7,
+            //     first: "首页",
+            //     last: "尾页",
+            //     prev: "上一页",
+            //     next: "下一页",
+            //     // startPage:1,
+
+            //     // loop:true,
+            //     onPageClick: function (event, page) {
+            //         //  console.log(event,page);
+            //         $("#btnSearch").trigger("click", page);
+
+            //         // $('#page-content').text('Page ' + page);
+            //     }
+            // });
         })
 
 
