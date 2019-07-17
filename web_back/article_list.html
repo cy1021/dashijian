@@ -301,7 +301,7 @@
 
                 <td class="text-center">
                     <a href="article_edit.html" data-id= "{{$value.id}}"  class="btn btn-default btn-xs">编辑</a>
-                    <a href="javascript:;" data-id= "{{$value.id}}" class="btn btn-danger btn-xs">删除</a>
+                    <a href="javascript:;" data-id= "{{$value.id}}" class="btn btn-danger btn-xs del">删除</a>
                 </td>
             </tr>
 
@@ -378,6 +378,7 @@
                 onPageClick: function (event, page) {
                     //  console.log(event,page);
                     $("#btnSearch").trigger("click", page);
+                    window.page = page;
 
 
                     // $('#page-content').text('Page ' + page);
@@ -385,8 +386,27 @@
             };
             $pagination.twbsPagination(defaultOpts);
 
+            
+            $("tbody").on("click",".del",function(){
+                if(confirm("确定删除?")){
+                    var id = $(this).attr("data-id")
+                $.ajax({
+                    url:'http://localhost:8000/admin/article_delete',
+                    data:{
+                        id:id
+                    },
+                    success:function(backData){
+                       if(backData.code ==200){
+                        $("#btnSearch").trigger("click", page);
+                       }
+                        
+                    }
+                })
+                }
+            
+            })
 
-
+          
             // $('.pagination').twbsPagination({
             //     totalPages: 35,
             //     visiblePages: 7,
