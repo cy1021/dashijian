@@ -24,6 +24,7 @@
         </div>
     </div>
 
+
     <div class="menu_con">
         <div class="menu">
             <div class="menu_collapse fl">
@@ -204,7 +205,35 @@
         <p>CopyRight © 2019 深圳大事件信息技术股份有限公司 All Rights Reserved</p>
         <p>电话：0755-****888 粤ICP备*******8号</p>
     </div>
+    <script src="./js/jquery-1.12.4.min.js"></script>
+    <script>
+        $(function(){
 
+            var id = window.location.search.split("=")[1];
+
+            $.ajax({
+                url:"http://localhost:8000/admin/search",
+                data:{
+                    id:id,
+                },
+                success:function(resData){
+                    // console.log(resData);
+                    if(resData.code ==200){
+                        $(".article_title").text(resData.data.title);
+                        $(".article_con").html(resData.data.content);
+                        var str = "杰克 发布于 "+ resData.data.date+"&nbsp;&nbsp;&nbsp;分类: "+ resData.data.type+"&nbsp;&nbsp;&nbsp;阅读:("+ resData.data.read+")&nbsp;&nbsp;&nbsp;评论: ("+resData.data.comment+")"
+                
+                        $(".article_info").html(str)
+                        console.log(resData.data.content);
+                        
+                    }
+                    
+                }
+
+            })
+        })
+
+    </script>
 </body>
 
 </html>
